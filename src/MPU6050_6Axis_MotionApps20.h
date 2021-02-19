@@ -322,11 +322,10 @@ uint8_t MPU6050::dmpInitialize() {
 
 	DEBUG_PRINTLN(F("Setting sample rate to CLOCK_RATE..."));
 	// NET234
-	//setRate(0); // 1khz / (1 + 0) = 1000 Hz !!! 100 in fact
 	//setRate(4); // 1khz / (1 + 4) = 200 Hz !!! 100 in fact
 	//setRate(9); // 1khz / (1 + 9) = 100 Hz !!! 50 
     //setRate(19); // 1khz / (1 + 19) = 50 Hz  !!! 25
-	//setRate(39); // 1khz / (1 + 39) = 25 Hz  !!! 12
+	//setRate(39); // 1khz / (1 + 39) = 25 Hz  !!! 12  but cabration wont work
 	setRate(CLOCK_RATE);
 
 	DEBUG_PRINTLN(F("Setting external frame sync to TEMP_OUT_L[0]..."));
@@ -336,13 +335,10 @@ uint8_t MPU6050::dmpInitialize() {
 	setDLPFMode(MPU6050_DLPF_BW_42);
 
 	DEBUG_PRINTLN(F("Setting gyro sensitivity to +/- MPU6050_GYRO_FS deg/sec..."));
-//NET234 ajust this with setrate
+//NET234 ajust this with set rate overwise values read wont fit
 //	setFullScaleGyroRange(MPU6050_GYRO_FS_2000);   //rate should be 4
-//  setFullScaleGyroRange(MPU6050_GYRO_FS_1000);   // rat should be 9
-//    setFullScaleGyroRange(MPU6050_GYRO_FS_500);   // rat should be 19
-//    setFullScaleGyroRange(MPU6050_GYRO_FS_250);   // rat should be 19  (calibration accel wont work)
 	setFullScaleGyroRange(MPU6050_GYRO_FS);
-	setFullScaleAccelRange(MPU6050_ACCEL_FS); //!! was missing ?
+//	setFullScaleAccelRange(MPU6050_ACCEL_FS); // ?? missing ??
 
 	// load DMP code into memory banks
 	DEBUG_PRINT(F("Writing DMP code to MPU memory banks ("));
