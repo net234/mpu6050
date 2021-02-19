@@ -32,7 +32,61 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ===============================================
+NET234 note
+setFullScaleGyroRange must be accorded with speed rate !!!
+//	setFullScaleGyroRange(MPU6050_GYRO_FS_2000);   //rate should be 0   167HZ ???
+//  setFullScaleGyroRange(MPU6050_GYRO_FS_1000);   // rate should be 3
+//    setFullScaleGyroRange(MPU6050_GYRO_FS_500);   // rate should be 9
+//    setFullScaleGyroRange(MPU6050_GYRO_FS_250);   // rate should be 19
+// setFullScaleGyroRange(MPU6050_GYRO_FS)
+// setFullScaleAccelRange(MPU6050_ACCEL_FS)
+// should be setRate(4); // 1khz / (1 + 4) = 200 Hz  but  100Hz in fact 
 */
+#define CLOCK_RATIO  3   
+//this will define CLOCK_RATE  0  4  9  19  39
+//  0  -> 167 HZ ??
+//  1  -> 125 HZ ??
+//  2  ->  167 Hz  ??
+//  3  ->  125 Hz  ??
+//  4  ->  100 HZ     81...
+//  9  ->  50 Hz
+// 19  ->  25 Hz
+#if CLOCK_RATIO == 1
+#define CLOCK_RATE 4
+#define MPU6050_GYRO_FS   MPU6050_GYRO_FS_2000
+#define MPU6050_ACCEL_FS  MPU6050_ACCEL_FS_2
+#endif
+
+#if CLOCK_RATIO == 2
+#define CLOCK_RATE 9
+#define MPU6050_GYRO_FS   MPU6050_GYRO_FS_1000
+#define MPU6050_ACCEL_FS  MPU6050_ACCEL_FS_2
+#endif
+
+#if CLOCK_RATIO == 3
+#define CLOCK_RATE 19
+#define MPU6050_GYRO_FS   MPU6050_GYRO_FS_500
+#define MPU6050_ACCEL_FS  MPU6050_ACCEL_FS_2
+#endif
+
+#if CLOCK_RATIO == 4
+#define CLOCK_RATE 39
+#define MPU6050_GYRO_FS   MPU6050_GYRO_FS_250
+#define MPU6050_ACCEL_FS  MPU6050_ACCEL_FS_2
+#endif
+
+
+//#define MPU6050_GYRO_FS_250         0x00
+//#define MPU6050_GYRO_FS_500         0x01
+//#define MPU6050_GYRO_FS_1000        0x02
+//#define MPU6050_GYRO_FS_2000        0x03
+
+//#define MPU6050_ACCEL_FS_2          0x00
+//#define MPU6050_ACCEL_FS_4          0x01
+//#define MPU6050_ACCEL_FS_8          0x02
+//#define MPU6050_ACCEL_FS_16         0x03
+
+
 
 #ifndef _MPU6050_H_
 #define _MPU6050_H_
