@@ -38,7 +38,7 @@ setFullScaleGyroRange must be accorded with speed rate !!!
 // setFullScaleAccelRange(MPU6050_ACCEL_FS)
 // should be setRate(4); // 1khz / (1 + 4) = 200 Hz  but  100Hz in fact 
 */
-#define CLOCK_RATIO  3   
+#define CLOCK_RATIO  4   
 //some test about CLOCK_RATE 
 //  rate -> mesures per sec 
 //  0  -> 167 HZ ??
