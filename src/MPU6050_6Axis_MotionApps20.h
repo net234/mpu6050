@@ -338,7 +338,7 @@ uint8_t MPU6050::dmpInitialize() {
 //NET234 ajust this with set rate overwise values read wont fit
 //	setFullScaleGyroRange(MPU6050_GYRO_FS_2000);   //rate should be 4
 	setFullScaleGyroRange(MPU6050_GYRO_FS);
-//	setFullScaleAccelRange(MPU6050_ACCEL_FS); // ?? missing ??
+	setFullScaleAccelRange(MPU6050_ACCEL_FS); // ?? missing ??
 
 	// load DMP code into memory banks
 	DEBUG_PRINT(F("Writing DMP code to MPU memory banks ("));
@@ -358,7 +358,8 @@ uint8_t MPU6050::dmpInitialize() {
 
 	DEBUG_PRINTLN(F("Clearing OTP Bank flag..."));
 	setOTPBankValid(false); 
-/****
+
+
 DEBUG_PRINTLN(F("Setting motion detection threshold to 2..."));
 setMotionDetectionThreshold(2);
 
@@ -372,7 +373,7 @@ DEBUG_PRINTLN(F("Setting zero-motion detection duration to 0..."));
 setZeroMotionDetectionDuration(0);
 DEBUG_PRINTLN(F("Enabling FIFO..."));
 
-*****/
+/*****
  
 	DEBUG_PRINTLN(F("Setting motion detection threshold to 2..."));
 	setMotionDetectionThreshold(200);
@@ -385,6 +386,9 @@ DEBUG_PRINTLN(F("Enabling FIFO..."));
 
 	DEBUG_PRINTLN(F("Setting zero-motion detection duration to 0..."));
 	setZeroMotionDetectionDuration(200);
+
+****/
+
 
 	DEBUG_PRINTLN(F("Enabling FIFO..."));
 	setFIFOEnabled(true);
@@ -520,9 +524,9 @@ uint8_t MPU6050::dmpGetGyro(VectorInt16 *v, const uint8_t* packet) {
 // uint8_t MPU6050::dmpGetLinearAccel(long *data, const uint8_t* packet);
 uint8_t MPU6050::dmpGetLinearAccel(VectorInt16 *v, VectorInt16 *vRaw, VectorFloat *gravity) {
     // get rid of the gravity component (+1g = +8192 in standard DMP FIFO packet, sensitivity is 2g)
-    v -> x = vRaw -> x - gravity -> x*8192;
-    v -> y = vRaw -> y - gravity -> y*8192;
-    v -> z = vRaw -> z - gravity -> z*8192;
+	v -> x = (vRaw -> x - gravity -> x*8192); // * CLOCK_RATIO;
+	v -> y = (vRaw -> y - gravity -> y*8192); // * CLOCK_RATIO;
+	v -> z = (vRaw -> z - gravity -> z*8192); // * CLOCK_RATIO;
     return 0;
 }
 // uint8_t MPU6050::dmpGetLinearAccelInWorld(long *data, const uint8_t* packet);

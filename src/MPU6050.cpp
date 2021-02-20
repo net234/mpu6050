@@ -3238,7 +3238,8 @@ void MPU6050::CalibrateGyro(uint8_t Loops ) {
 void MPU6050::CalibrateAccel(uint8_t Loops ) {
 
 	float kP = 0.3;
-	float kI = 20;
+	//float kI = 20;
+	float kI = 40 / CLOCK_RATIO;
 	float x;
 	x = (100 - map(Loops, 1, 5, 20, 0)) * .01;
 	kP *= x;
@@ -3270,8 +3271,8 @@ void MPU6050::PID(uint8_t ReadAddress, float kP,float kI, uint8_t Loops){
 	//net234  infinite loop in certain case
 	for (int L = 0; L < Loops; L++) {
 		eSample = 0;
-//		for (int c = 0; c < 100; c++) {// 100 PI Calculations
-		for (int c = 0; c < 100 * CLOCK_RATIO; c++) {// 100 PI Calculations
+	for (int c = 0; c < 100; c++) {// 100 PI Calculations
+//		for (int c = 0; c < 100 * CLOCK_RATIO; c++) {// 100 PI Calculations
 			eSum = 0;
 			for (int i = 0; i < 3; i++) {
 				I2Cdev::readWords(devAddr, ReadAddress + (i * 2), 1, (uint16_t *)&Data); // reads 1 or more 16 bit integers (Word)
@@ -3280,25 +3281,35 @@ void MPU6050::PID(uint8_t ReadAddress, float kP,float kI, uint8_t Loops){
 				Error = -Reading;
 				eSum += abs(Reading);
 				PTerm = kP * Error;
-				ITerm[i] += (Error * 0.001) * kI;				// Integral term 1000 Calculations a second = 0.001
+//				ITerm[i] += (Error * 0.001) * kI;				// Integral term 1000 Calculations a second = 0.001
+			//NET234 this must be ajusted with clock rate
+				ITerm[i] += (Error * 0.001 ) * kI ;				// Integral term 1000 Calculations a second = 0.001
+				
 				if(SaveAddress != 0x13){
 					Data = round((PTerm + ITerm[i] ) / 8);		//Compute PID Output
 					Data = ((Data)&0xFFFE) |BitZero[i];			// Insert Bit0 Saved at beginning
 				} else Data = round((PTerm + ITerm[i] ) / 4);	//Compute PID Output
 				I2Cdev::writeWords(devAddr, SaveAddress + (i * shift), 1, (uint16_t *)&Data);
 			}
-			//NET23 this should be ajusted with clock rate
-			if((c == 99) && eSum > 1000){						// Error is still to great to continue 
-			//if((c == 99) && eSum > 2000){						// Error is still to great to continue 
+//			Serial.print(eSum);
+//			Serial.print(' ');
+			
+//			if((c == 99) && eSum > 1000){						// Error is still to great to continue 
+			if((c == 99) && eSum > 1000 * CLOCK_RATIO){						// Error is still to great to continue 
 				c = 0;
+//				Serial.print(eSample);
+//				Serial.print(' ');
 				Serial.println(eSum);
+				
 				Serial.write('*');
+				break;       // to avoid lockup
 			}
 			if((eSum * ((ReadAddress == 0x3B)?.05: 1)) < 5) eSample++;	// Successfully found offsets prepare to  advance
-//			if((eSum * ((ReadAddress == 0x3B)?.05: 1)) < 10) eSample++;	// Successfully found offsets prepare to  advance
-//			if((eSum < 100) && (c > 10) && (eSample >= 10)) break;		// Advance to next Loop
-			if((eSum < 100) && (c > 10 * CLOCK_RATIO) && (eSample >= 10)) break;		// Advance to next Loop
+//			if((eSum * ((ReadAddress == 0x3B)?.05: 1)) < 5*CLOCK_RATIO) eSample++;	// Successfully found offsets prepare to  advance
+			if((eSum < 100) && (c > 10) && (eSample >= 10)) break;		// Advance to next Loop
+//			if((eSum < 100) && (c > 10 * CLOCK_RATIO) && (eSample >= 10)) break;		// Advance to next Loop
 			delay(1);
+//			delay(CLOCK_RATIO);
 		}
 		Serial.write('.');
 		kP *= .75;
