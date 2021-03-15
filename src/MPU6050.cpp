@@ -3223,7 +3223,8 @@ void MPU6050::setDMPConfig2(uint8_t config) {
 */
 void MPU6050::CalibrateGyro(uint8_t Loops ) {
   double kP = 0.3;
-  double kI = 90;
+// double kI = 90;
+  double kI = 90 * CLOCK_RATIO;
   float x;
   x = (100 - map(Loops, 1, 5, 20, 0)) * .01;
   kP *= x;
@@ -3239,7 +3240,7 @@ void MPU6050::CalibrateAccel(uint8_t Loops ) {
 
 	float kP = 0.3;
 	//float kI = 20;
-	float kI = 40 / CLOCK_RATIO;
+	float kI = 20 * CLOCK_RATIO;
 	float x;
 	x = (100 - map(Loops, 1, 5, 20, 0)) * .01;
 	kP *= x;
@@ -3294,8 +3295,8 @@ void MPU6050::PID(uint8_t ReadAddress, float kP,float kI, uint8_t Loops){
 //			Serial.print(eSum);
 //			Serial.print(' ');
 			
-//			if((c == 99) && eSum > 1000){						// Error is still to great to continue 
-			if((c == 99) && eSum > 1000 * CLOCK_RATIO){						// Error is still to great to continue 
+			if((c == 99) && eSum > 1000){						// Error is still to great to continue 
+//			if((c == 99) && eSum > 1000 * CLOCK_RATIO){						// Error is still to great to continue 
 				c = 0;
 //				Serial.print(eSample);
 //				Serial.print(' ');
@@ -3308,8 +3309,8 @@ void MPU6050::PID(uint8_t ReadAddress, float kP,float kI, uint8_t Loops){
 //			if((eSum * ((ReadAddress == 0x3B)?.05: 1)) < 5*CLOCK_RATIO) eSample++;	// Successfully found offsets prepare to  advance
 			if((eSum < 100) && (c > 10) && (eSample >= 10)) break;		// Advance to next Loop
 //			if((eSum < 100) && (c > 10 * CLOCK_RATIO) && (eSample >= 10)) break;		// Advance to next Loop
-			delay(1);
-//			delay(CLOCK_RATIO);
+//			delay(10*CLOCK_RATIO);
+			delay(CLOCK_RATIO);
 		}
 		Serial.write('.');
 		kP *= .75;

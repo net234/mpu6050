@@ -47,7 +47,7 @@ typedef int16_t MPUOffsets_t[6];
 #error  nececite la lib MP6050 adaptee : "https://github.com/net234/mpu6050/tree/dev-NET234"
 #endif
 #if CLOCK_RATIO != 3
-#error  dans la lib MP6050.h CLOCK_RATIO doit etre a 3 
+#error  dans la lib MP6050.h CLOCK_RATIO doit etre a 3
 #endif
 
 // MPU_6050_Event is an interface classe to deal with MPU60_50
@@ -151,9 +151,9 @@ bool MPU6050_EVENT::calibrate(const bool autocalibrate) {
     }
     Serial.println(F("Start initializing DMP..."));
     if (autocalibrate || offsets[3] == 0) { // offset 3 4 5 is at 0 on power on
-      this->CalibrateAccel(30);
+      this->CalibrateAccel(5);
       Serial.println();
-      this->CalibrateGyro(30);
+      this->CalibrateGyro(5);
       Serial.println();
       this->PrintActiveOffsets();
       // turn on the DMP, now that it's ready
